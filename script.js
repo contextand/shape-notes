@@ -41,19 +41,27 @@ function setCategory(cat) {
 }
 
 function renderGrid(items) {
-  document.getElementById('grid').innerHTML = items.map(item => `
+  document.getElementById('grid').innerHTML = items.map((item, i) => {
+    // First 6 images load eagerly with high priority (above the fold)
+    // Next 6 load eagerly without priority boost
+    // Rest lazy-load as user scrolls
+    const loading = i < 12 ? 'eager' : 'lazy';
+    const priority = i < 6 ? 'fetchpriority="high"' : '';
+    return `
     <div class="card" data-no="${item.no}">
       <div class="card-img-wrap">
-        <img src="img/${item.no}.jpg" alt="${item.title}" loading="lazy">
+        <img src="img/${item.no}.jpg" alt="${item.title}" loading="${loading}" ${priority} decoding="async">
         <span class="cat-badge">${item.category}</span>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function showDetail(item) {
   document.getElementById('gallery-view').classList.add('hidden');
   document.getElementById('detail-view').classList.remove('hidden');
+  document.getElementById('mobile-cat-wrap').style.display = 'none';
 
   const img = document.getElementById('detail-img');
   img.src = `img/${item.no}.jpg`;
@@ -100,6 +108,7 @@ function setupEvents() {
   document.getElementById('back-btn').addEventListener('click', () => {
     document.getElementById('detail-view').classList.add('hidden');
     document.getElementById('gallery-view').classList.remove('hidden');
+    document.getElementById('mobile-cat-wrap').style.display = '';
     window.scrollTo(0, 0);
   });
 
