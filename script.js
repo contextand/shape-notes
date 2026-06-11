@@ -210,7 +210,7 @@ function setupBalls() {
       const x = margin + Math.random() * (W - margin * 2);
       const y = margin + Math.random() * (H - margin * 2);
       const angle = Math.random() * Math.PI * 2;
-      const speed = 0.35 + Math.random() * 0.55;
+      const speed = 0.45 + Math.random() * 0.65;
 
       const ballData = {
         el, x, y,

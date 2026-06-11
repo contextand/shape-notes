@@ -58,6 +58,11 @@ button {
 /* Card — no background so no gray box shows below image */
 .card {
   cursor: pointer;
+  position: relative;
+}
+
+.card:hover {
+  z-index: 1;
 }
 
 .card-img-wrap {
@@ -65,17 +70,18 @@ button {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   background: #e0e0e0;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
 .card-img-wrap img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.35s ease;
 }
 
-.card:hover .card-img-wrap img {
-  transform: scale(1.04);
+.card:hover .card-img-wrap {
+  transform: perspective(600px) rotateX(4deg) rotateY(-3deg) translateZ(10px);
+  box-shadow: 8px 16px 32px rgba(0,0,0,0.22);
 }
 
 /* Category badge: white text + shadow only, no background box */
@@ -198,7 +204,7 @@ button {
 /* "전체" ball: fixed at bottom-left, no animation */
 .ball-fixed {
   top: auto;
-  left: 28px;
+  right: 28px;
   bottom: 28px;
   will-change: auto;
 }
@@ -325,6 +331,7 @@ button {
     border-bottom: 1px solid #f0f0f0;
     z-index: 60;
     margin: 0;
+    text-align: left;
   }
 
   #detail-view {
