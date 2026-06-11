@@ -5,8 +5,10 @@ async function init() {
   const res = await fetch('info.json');
   data = await res.json();
   renderCategoryBar();
+  renderMobilePanel();
   renderGrid(data);
   setupEvents();
+  setupMobileFab();
 }
 
 function renderCategoryBar() {
@@ -15,6 +17,27 @@ function renderCategoryBar() {
   bar.innerHTML =
     `<button class="chip active" data-cat="">전체</button>` +
     categories.map(cat => `<button class="chip" data-cat="${cat}">${cat}</button>`).join('');
+}
+
+function renderMobilePanel() {
+  const panel = document.getElementById('cat-panel');
+  const categories = [...new Set(data.map(d => d.category))];
+  const all = ['', ...categories];
+  panel.innerHTML = all.map(cat => {
+    const label = cat === '' ? '전체' : cat;
+    const isActive = cat === activeCategory;
+    return `<button class="cat-item${isActive ? ' active' : ''}" data-cat="${cat}">${label}</button>`;
+  }).join('');
+}
+
+function setCategory(cat) {
+  activeCategory = cat;
+  // Sync desktop chips
+  document.querySelectorAll('#category-bar .chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.cat === cat);
+  });
+  const filtered = cat ? data.filter(d => d.category === cat) : data;
+  renderGrid(filtered);
 }
 
 function renderGrid(items) {
@@ -30,8 +53,7 @@ function renderGrid(items) {
 
 function showDetail(item) {
   document.getElementById('gallery-view').classList.add('hidden');
-  const detailView = document.getElementById('detail-view');
-  detailView.classList.remove('hidden');
+  document.getElementById('detail-view').classList.remove('hidden');
 
   const img = document.getElementById('detail-img');
   img.src = `img/${item.no}.jpg`;
@@ -61,7 +83,6 @@ function showDetail(item) {
 }
 
 function setupEvents() {
-  // Gallery grid: event delegation
   document.getElementById('grid').addEventListener('click', e => {
     const card = e.target.closest('.card');
     if (!card) return;
@@ -69,7 +90,6 @@ function setupEvents() {
     if (item) showDetail(item);
   });
 
-  // Related grid: event delegation
   document.getElementById('related-grid').addEventListener('click', e => {
     const card = e.target.closest('.related-card');
     if (!card) return;
@@ -77,24 +97,39 @@ function setupEvents() {
     if (item) showDetail(item);
   });
 
-  // Back button
   document.getElementById('back-btn').addEventListener('click', () => {
     document.getElementById('detail-view').classList.add('hidden');
     document.getElementById('gallery-view').classList.remove('hidden');
     window.scrollTo(0, 0);
   });
 
-  // Category bar: event delegation
+  // Desktop category bar
   document.getElementById('category-bar').addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (!chip) return;
-    document.querySelectorAll('#category-bar .chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeCategory = chip.dataset.cat;
-    const filtered = activeCategory
-      ? data.filter(d => d.category === activeCategory)
-      : data;
-    renderGrid(filtered);
+    setCategory(chip.dataset.cat);
+  });
+}
+
+function setupMobileFab() {
+  const fab = document.getElementById('cat-fab');
+  const panel = document.getElementById('cat-panel');
+
+  fab.addEventListener('click', () => {
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) {
+      panel.classList.remove('open');
+    } else {
+      renderMobilePanel(); // refresh active states before opening
+      panel.classList.add('open');
+    }
+  });
+
+  panel.addEventListener('click', e => {
+    const item = e.target.closest('.cat-item');
+    if (!item) return;
+    setCategory(item.dataset.cat);
+    panel.classList.remove('open');
   });
 }
 

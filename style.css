@@ -30,9 +30,9 @@ button {
 
 /* ===== Gallery View ===== */
 
-/* Mobile: 2 rows × chip height (~44px) + border */
+/* Mobile: FAB floats, keep bottom buffer so last row isn't covered */
 #gallery-view {
-  padding-bottom: 92px;
+  padding-bottom: 80px;
 }
 
 #grid {
@@ -43,7 +43,7 @@ button {
 }
 
 @media (min-width: 550px) {
-  /* Desktop: 1 row × chip height (~44px) + border */
+  /* Desktop: 1 row category bar */
   #gallery-view {
     padding-bottom: 50px;
   }
@@ -95,24 +95,23 @@ button {
   }
 }
 
-/* ===== Category Bar ===== */
-/* Mobile: 5 cols × 2 rows | Desktop: 10 cols × 1 row */
+/* ===== Category Bar (Desktop only) ===== */
 
 #category-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #fff;
-  border-top: 1px solid #e8e8e8;
-  z-index: 50;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: none; /* hidden on mobile — replaced by FAB */
 }
 
 @media (min-width: 550px) {
   #category-bar {
-    grid-template-columns: repeat(10, 1fr);
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid #e8e8e8;
+    z-index: 50;
   }
 }
 
@@ -140,19 +139,98 @@ button {
   color: #666;
 }
 
-/* Vertical dividers between chips — mobile: not at column 5 or 10 */
-.chip:not(:nth-child(5n)) {
-  border-right: 1px solid #e8e8e8;
-}
-
+/* Dividers between desktop chips */
 @media (min-width: 550px) {
-  /* Reset mobile dividers, apply single-row dividers */
-  .chip:not(:nth-child(5n)) {
-    border-right: none;
-  }
   .chip:not(:last-child) {
     border-right: 1px solid #e8e8e8;
   }
+}
+
+/* ===== Mobile Floating Category Button ===== */
+
+#mobile-cat-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  position: fixed;
+  bottom: 24px;
+  right: 18px;
+  z-index: 100;
+}
+
+@media (min-width: 550px) {
+  #mobile-cat-wrap {
+    display: none;
+  }
+}
+
+#cat-fab {
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  padding: 10px 20px;
+  border-radius: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  line-height: 1;
+}
+
+#cat-panel {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
+  border: 1px solid #ebebeb;
+  min-width: 140px;
+  /* slide-up animation state */
+  opacity: 0;
+  transform: translateY(10px) scale(0.97);
+  transform-origin: bottom right;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.22s ease, visibility 0s 0.22s;
+  visibility: hidden;
+}
+
+#cat-panel.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity 0.2s ease, transform 0.22s ease, visibility 0s 0s;
+}
+
+.cat-item {
+  display: block;
+  width: 100%;
+  padding: 13px 22px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  color: #bbb;
+  white-space: nowrap;
+  cursor: pointer;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  transition: color 0.15s;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f2f2f2;
+  font-family: inherit;
+}
+
+.cat-item:last-child {
+  border-bottom: none;
+}
+
+.cat-item.active {
+  color: #111;
+}
+
+.cat-item:hover:not(.active) {
+  color: #555;
 }
 
 /* ===== Detail View ===== */
