@@ -61,18 +61,12 @@ function setCategory(cat) {
   renderGrid(filtered);
 }
 
-function hexToRgb(hex) {
-  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)].join(' ');
-}
-
 function renderGrid(items) {
   document.getElementById('grid').innerHTML = items.map((item, i) => {
     const loading = i < 12 ? 'eager' : 'lazy';
     const priority = i < 6 ? 'fetchpriority="high"' : '';
-    const cfg = BALL_CONFIG.find(c => c.cat === item.category) || BALL_CONFIG[0];
-    const catRgb = hexToRgb(cfg.color);
     return `
-    <div class="card" data-no="${item.no}" style="--cat-rgb:${catRgb}">
+    <div class="card" data-no="${item.no}">
       <div class="card-img-wrap">
         <img src="img/${item.no}.jpg" alt="${item.title}" loading="${loading}" ${priority} decoding="async">
         <span class="cat-badge">${item.category}</span>

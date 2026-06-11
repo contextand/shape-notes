@@ -80,31 +80,8 @@ button {
 }
 
 .card:hover .card-img-wrap {
-  transform: perspective(800px) rotateX(2deg) rotateY(2deg) translateY(-5px) translateZ(6px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-/* Shimmer sweep on hover using category color */
-.card-img-wrap::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    105deg,
-    transparent 28%,
-    rgb(var(--cat-rgb) / 0.18) 43%,
-    rgba(255, 255, 255, 0.3) 50%,
-    rgb(var(--cat-rgb) / 0.18) 57%,
-    transparent 72%
-  );
-  transform: translateX(-120%) skewX(-10deg);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.card:hover .card-img-wrap::after {
-  transform: translateX(160%) skewX(-10deg);
-  transition: transform 0.55s ease-in-out;
+  transform: perspective(800px) rotateX(3deg) rotateY(3deg) translateZ(10px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.18);
 }
 
 /* Category badge: white text + shadow only, no background box */
