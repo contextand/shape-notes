@@ -30,11 +30,11 @@ button {
 
 /* ===== Gallery View ===== */
 
+/* Mobile: 2 rows × chip height (~44px) + border */
 #gallery-view {
-  padding-bottom: 80px;
+  padding-bottom: 92px;
 }
 
-/* Auto-fill responsive grid: ~250px column, fills full width */
 #grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -43,18 +43,19 @@ button {
 }
 
 @media (min-width: 550px) {
+  /* Desktop: 1 row × chip height (~44px) + border */
+  #gallery-view {
+    padding-bottom: 50px;
+  }
+
   #grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 3px;
     padding: 3px;
   }
-
-  #gallery-view {
-    padding-bottom: 52px;
-  }
 }
 
-/* Card */
+/* Card — no background so no gray box shows below image */
 .card {
   cursor: pointer;
 }
@@ -77,7 +78,7 @@ button {
   transform: scale(1.04);
 }
 
-/* Category badge: white text only, no background */
+/* Category badge: white text + shadow only, no background box */
 .cat-badge {
   position: absolute;
   bottom: 7px;
@@ -88,27 +89,14 @@ button {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
-.card-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: #111;
-  padding: 6px 6px 8px;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-}
-
 @media (min-width: 550px) {
   .cat-badge {
     font-size: 11px;
   }
-  .card-title {
-    font-size: 12px;
-    padding: 8px 4px 12px;
-  }
 }
 
 /* ===== Category Bar ===== */
-/* Mobile: 2 rows × 5 columns | Desktop: 1 row × 10 columns */
+/* Mobile: 5 cols × 2 rows | Desktop: 10 cols × 1 row */
 
 #category-bar {
   position: fixed;
@@ -129,19 +117,19 @@ button {
 }
 
 .chip {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 900;
   text-align: center;
-  padding: 10px 4px;
-  color: #bbb;
+  padding: 11px 4px;
+  color: #ccc;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   transition: color 0.15s;
   border: none;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .chip.active {
@@ -149,13 +137,21 @@ button {
 }
 
 .chip:hover:not(.active) {
-  color: #555;
+  color: #666;
+}
+
+/* Vertical dividers between chips — mobile: not at column 5 or 10 */
+.chip:not(:nth-child(5n)) {
+  border-right: 1px solid #e8e8e8;
 }
 
 @media (min-width: 550px) {
-  .chip {
-    font-size: 11px;
-    padding: 12px 6px;
+  /* Reset mobile dividers, apply single-row dividers */
+  .chip:not(:nth-child(5n)) {
+    border-right: none;
+  }
+  .chip:not(:last-child) {
+    border-right: 1px solid #e8e8e8;
   }
 }
 
@@ -194,7 +190,6 @@ button {
   display: block;
 }
 
-/* Same treatment: white text, no background */
 #detail-cat-badge {
   position: absolute;
   bottom: 10px;

@@ -24,7 +24,6 @@ function renderGrid(items) {
         <img src="img/${item.no}.jpg" alt="${item.title}" loading="lazy">
         <span class="cat-badge">${item.category}</span>
       </div>
-      <div class="card-title">${item.title}</div>
     </div>
   `).join('');
 }
