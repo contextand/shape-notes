@@ -192,14 +192,16 @@ function setupBalls() {
       const margin = BALL_RADIUS + 20;
       const x = margin + Math.random() * (W - margin * 2);
       const y = margin + Math.random() * (H - margin * 2);
-      // Slow random velocity
       const angle = Math.random() * Math.PI * 2;
-      const speed = 0.4 + Math.random() * 0.6;
+      const speed = 0.35 + Math.random() * 0.55;
 
       const ballData = {
         el, x, y,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
+        baseSpeed: speed,
+        phase: Math.random() * Math.PI * 2,     // random start in cycle
+        phaseRate: 0.003 + Math.random() * 0.007, // each ball at a different cycle rate
         hovering: false,
       };
 
@@ -228,13 +230,29 @@ function startAnimation() {
     for (const ball of balls) {
       if (ball.hovering) continue;
 
+      // 1. Speed cycle: sin wave creates slow accel/decel (each ball at own tempo)
+      ball.phase += ball.phaseRate;
+      const speedFactor = 0.25 + 1.5 * (0.5 + 0.5 * Math.sin(ball.phase)); // 0.25→1.75×
+      const targetSpeed = ball.baseSpeed * speedFactor;
+
+      // 2. Inertia: gently converge current speed toward target (creates lag / mass feel)
+      const currentSpeed = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy) || 0.01;
+      const newSpeed = currentSpeed + (targetSpeed - currentSpeed) * 0.012;
+      const scale = newSpeed / currentSpeed;
+      ball.vx *= scale;
+      ball.vy *= scale;
+
+      // 3. Micro drift: tiny random nudge bends the path into subtle curves
+      ball.vx += (Math.random() - 0.5) * 0.002;
+      ball.vy += (Math.random() - 0.5) * 0.002;
+
       ball.x += ball.vx;
       ball.y += ball.vy;
 
-      if (ball.x < BALL_RADIUS)        { ball.x = BALL_RADIUS;        ball.vx =  Math.abs(ball.vx); }
+      // Bounce off edges
+      if (ball.x < BALL_RADIUS)          { ball.x = BALL_RADIUS;      ball.vx =  Math.abs(ball.vx); }
       else if (ball.x > W - BALL_RADIUS) { ball.x = W - BALL_RADIUS;  ball.vx = -Math.abs(ball.vx); }
-
-      if (ball.y < BALL_RADIUS)        { ball.y = BALL_RADIUS;        ball.vy =  Math.abs(ball.vy); }
+      if (ball.y < BALL_RADIUS)          { ball.y = BALL_RADIUS;      ball.vy =  Math.abs(ball.vy); }
       else if (ball.y > H - BALL_RADIUS) { ball.y = H - BALL_RADIUS;  ball.vy = -Math.abs(ball.vy); }
 
       ball.el.style.transform = `translate(${ball.x - BALL_RADIUS}px, ${ball.y - BALL_RADIUS}px)`;
