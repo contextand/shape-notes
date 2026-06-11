@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>조형 노트</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <section id="gallery-view">
+      <div id="grid"></div>
+      <nav id="category-bar"></nav>
+    </section>
+
+    <section id="detail-view" class="hidden">
+      <button id="back-btn" aria-label="뒤로 가기">←</button>
+      <div id="detail-main">
+        <div id="detail-img-wrap">
+          <img id="detail-img" src="" alt="">
+          <span id="detail-cat-badge"></span>
+        </div>
+        <div id="detail-info">
+          <h1 id="detail-title"></h1>
+          <p id="detail-sub"></p>
+          <div id="detail-tags"></div>
+        </div>
+      </div>
+      <div id="related-wrap" class="hidden">
+        <div id="related-grid"></div>
+      </div>
+    </section>
+
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
