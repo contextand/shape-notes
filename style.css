@@ -311,6 +311,27 @@ button {
   opacity: 0.5;
 }
 
+/* Mobile: back button fixed at top so it stays visible while scrolling */
+@media (max-width: 549px) {
+  #back-btn {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 14px 16px 12px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid #f0f0f0;
+    z-index: 60;
+    margin: 0;
+  }
+
+  #detail-view {
+    padding-top: 54px; /* room for fixed back button */
+  }
+}
+
 #detail-main {
   display: flex;
   flex-direction: column;

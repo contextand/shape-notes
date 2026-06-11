@@ -75,7 +75,22 @@ function renderGrid(items) {
   }).join('');
 }
 
+function returnToGallery() {
+  document.getElementById('detail-view').classList.add('hidden');
+  document.getElementById('gallery-view').classList.remove('hidden');
+  document.getElementById('mobile-cat-wrap').style.display = '';
+  showBallsLayer();
+  window.scrollTo(0, 0);
+}
+
 function showDetail(item) {
+  const alreadyInDetail = !document.getElementById('detail-view').classList.contains('hidden');
+  if (alreadyInDetail) {
+    history.replaceState({ view: 'detail', no: item.no }, '');
+  } else {
+    history.pushState({ view: 'detail', no: item.no }, '');
+  }
+
   document.getElementById('gallery-view').classList.add('hidden');
   document.getElementById('detail-view').classList.remove('hidden');
   document.getElementById('mobile-cat-wrap').style.display = 'none';
@@ -123,11 +138,13 @@ function setupEvents() {
   });
 
   document.getElementById('back-btn').addEventListener('click', () => {
-    document.getElementById('detail-view').classList.add('hidden');
-    document.getElementById('gallery-view').classList.remove('hidden');
-    document.getElementById('mobile-cat-wrap').style.display = '';
-    showBallsLayer();
-    window.scrollTo(0, 0);
+    history.back();
+  });
+
+  window.addEventListener('popstate', () => {
+    if (!document.getElementById('detail-view').classList.contains('hidden')) {
+      returnToGallery();
+    }
   });
 
   document.getElementById('category-bar').addEventListener('click', e => {
