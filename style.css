@@ -157,6 +157,7 @@ button {
   bottom: 24px;
   right: 18px;
   z-index: 100;
+  pointer-events: none; /* container is transparent to touch */
 }
 
 @media (min-width: 550px) {
@@ -172,15 +173,16 @@ button {
   font-weight: 900;
   letter-spacing: -0.02em;
   padding: 10px 20px;
-  border-radius: 24px;
+  border-radius: 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
   cursor: pointer;
   line-height: 1;
+  pointer-events: auto; /* FAB is always tappable */
 }
 
 #cat-panel {
   background: #fff;
-  border-radius: 14px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
   border: 1px solid #ebebeb;
@@ -197,7 +199,7 @@ button {
 #cat-panel.open {
   opacity: 1;
   transform: translateY(0) scale(1);
-  pointer-events: auto;
+  pointer-events: auto; /* panel is tappable only when open */
   visibility: visible;
   transition: opacity 0.2s ease, transform 0.22s ease, visibility 0s 0s;
 }
