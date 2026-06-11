@@ -43,9 +43,9 @@ button {
 }
 
 @media (min-width: 550px) {
-  /* Desktop: 1 row category bar */
+  /* Desktop: no fixed bar, small buffer */
   #gallery-view {
-    padding-bottom: 50px;
+    padding-bottom: 20px;
   }
 
   #grid {
@@ -82,10 +82,12 @@ button {
 .cat-badge {
   position: absolute;
   bottom: 7px;
-  right: 8px;
+  left: 8px;
   color: #fff;
   font-size: 10px;
+  font-weight: 900;
   line-height: 1.4;
+  letter-spacing: -0.02em;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
@@ -101,17 +103,10 @@ button {
   display: none; /* hidden on mobile — replaced by FAB */
 }
 
+/* Desktop: category bar replaced by floating balls */
 @media (min-width: 550px) {
   #category-bar {
-    display: grid;
-    grid-template-columns: repeat(11, 1fr);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border-top: 1px solid #e8e8e8;
-    z-index: 50;
+    display: none;
   }
 }
 
@@ -144,6 +139,68 @@ button {
   .chip:not(:last-child) {
     border-right: 1px solid #e8e8e8;
   }
+}
+
+/* ===== Floating Balls (Desktop Only) ===== */
+
+#balls-layer {
+  display: none;
+}
+
+@media (min-width: 550px) {
+  #balls-layer {
+    display: block;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 30;
+  }
+}
+
+.ball {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--ball-color, #111);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  will-change: transform;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.ball span {
+  display: block;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  padding: 0 8px;
+}
+
+.ball:hover {
+  filter: brightness(1.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.3);
+}
+
+.ball.active {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ball-color, #111), 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* "전체" ball: fixed at bottom-left, no animation */
+.ball-fixed {
+  top: auto;
+  left: 28px;
+  bottom: 28px;
+  will-change: auto;
 }
 
 /* ===== Mobile Floating Category Button ===== */
