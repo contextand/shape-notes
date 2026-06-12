@@ -304,7 +304,7 @@ function showBallsLayer() {
 
 // ===== Mobile Ball System =====
 
-const MOBILE_BALL_R = 40;
+const MOBILE_BALL_R = 55;
 let mobileBalls = [];
 let mobileAnimId = null;
 let mobileBallsOpen = false;
@@ -364,55 +364,90 @@ function runMobilePhysics() {
   if (mobileAnimId) cancelAnimationFrame(mobileAnimId);
 
   const W = window.innerWidth;
-  const FLOOR = window.innerHeight - MOBILE_BALL_R - 28;
-  const G = 0.55, BOUNCE = 0.28, FRICTION = 0.86;
+  const H = window.innerHeight;
+  const FLOOR = H - MOBILE_BALL_R;
+  const FAB_X = W - MOBILE_BALL_R;
+  const FAB_Y = H - MOBILE_BALL_R;
+  const G = 0.55, BOUNCE = 0.25, FRICTION = 0.84;
 
   function step() {
-    let active = false;
-
+    // Integrate velocity and position
     for (const b of mobileBalls) {
       b.vy += G;
       b.x += b.vx;
       b.y += b.vy;
-
-      if (b.y > FLOOR) {
-        b.y = FLOOR;
-        b.vy = -Math.abs(b.vy) * BOUNCE;
-        b.vx *= FRICTION;
-        if (Math.abs(b.vy) < 0.5) b.vy = 0;
-        if (Math.abs(b.vx) < 0.05) b.vx = 0;
-      }
-      if (b.x < MOBILE_BALL_R) { b.x = MOBILE_BALL_R; b.vx = Math.abs(b.vx) * 0.6; }
-      else if (b.x > W - MOBILE_BALL_R) { b.x = W - MOBILE_BALL_R; b.vx = -Math.abs(b.vx) * 0.6; }
-
-      b.el.style.transform = `translate(${b.x - MOBILE_BALL_R}px, ${b.y - MOBILE_BALL_R}px)`;
-      if (b.vy !== 0 || b.vx !== 0 || b.y < FLOOR) active = true;
     }
 
-    // Ball-ball collision
-    for (let i = 0; i < mobileBalls.length; i++) {
-      for (let j = i + 1; j < mobileBalls.length; j++) {
-        const a = mobileBalls[i], b = mobileBalls[j];
-        const dx = b.x - a.x, dy = b.y - a.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const minD = MOBILE_BALL_R * 2;
-        if (dist < minD && dist > 0) {
-          const overlap = (minD - dist) / 2;
-          const nx = dx / dist, ny = dy / dist;
-          a.x -= nx * overlap; a.y -= ny * overlap;
-          b.x += nx * overlap; b.y += ny * overlap;
-          const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
-          const dot = dvx * nx + dvy * ny;
-          if (dot > 0) {
-            const k = dot * 0.55;
-            a.vx -= k * nx; a.vy -= k * ny;
-            b.vx += k * nx; b.vy += k * ny;
+    // 4-pass constraint resolution for clean non-overlapping boundaries
+    for (let pass = 0; pass < 4; pass++) {
+      // Floor and walls
+      for (const b of mobileBalls) {
+        if (b.y > FLOOR) {
+          b.y = FLOOR;
+          if (pass === 0) {
+            b.vy = -Math.abs(b.vy) * BOUNCE;
+            b.vx *= FRICTION;
+            if (Math.abs(b.vy) < 0.5) b.vy = 0;
+            if (Math.abs(b.vx) < 0.05) b.vx = 0;
           }
-          active = true;
+        }
+        if (b.x < MOBILE_BALL_R) {
+          b.x = MOBILE_BALL_R;
+          if (pass === 0) b.vx = Math.abs(b.vx) * 0.5;
+        } else if (b.x > W - MOBILE_BALL_R) {
+          b.x = W - MOBILE_BALL_R;
+          if (pass === 0) b.vx = -Math.abs(b.vx) * 0.5;
+        }
+        // '분류' fab ball as static obstacle
+        const fdx = b.x - FAB_X, fdy = b.y - FAB_Y;
+        const fd = Math.sqrt(fdx * fdx + fdy * fdy);
+        const fMin = MOBILE_BALL_R * 2;
+        if (fd < fMin && fd > 0) {
+          const fnx = fdx / fd, fny = fdy / fd;
+          b.x += fnx * (fMin - fd);
+          b.y += fny * (fMin - fd);
+          if (pass === 0) {
+            const fdot = b.vx * fnx + b.vy * fny;
+            if (fdot < 0) {
+              b.vx -= fdot * fnx * (1 + BOUNCE);
+              b.vy -= fdot * fny * (1 + BOUNCE);
+            }
+          }
+        }
+      }
+
+      // Ball-ball collisions
+      for (let i = 0; i < mobileBalls.length; i++) {
+        for (let j = i + 1; j < mobileBalls.length; j++) {
+          const a = mobileBalls[i], b = mobileBalls[j];
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const minD = MOBILE_BALL_R * 2;
+          if (dist < minD && dist > 0) {
+            const nx = dx / dist, ny = dy / dist;
+            const half = (minD - dist) * 0.5;
+            a.x -= nx * half; a.y -= ny * half;
+            b.x += nx * half; b.y += ny * half;
+            if (pass === 0) {
+              const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
+              const dot = dvx * nx + dvy * ny;
+              if (dot > 0) {
+                const k = dot * 0.45;
+                a.vx -= k * nx; a.vy -= k * ny;
+                b.vx += k * nx; b.vy += k * ny;
+              }
+            }
+          }
         }
       }
     }
 
+    // Update DOM and check if still active
+    let active = false;
+    for (const b of mobileBalls) {
+      b.el.style.transform = `translate(${b.x - MOBILE_BALL_R}px, ${b.y - MOBILE_BALL_R}px)`;
+      if (Math.abs(b.vy) > 0.05 || Math.abs(b.vx) > 0.05 || b.y < FLOOR - 0.5) active = true;
+    }
     mobileAnimId = active ? requestAnimationFrame(step) : null;
   }
 
