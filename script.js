@@ -335,16 +335,14 @@ function spawnMobileBalls() {
   const H = window.innerHeight;
   const D = MOBILE_BALL_R * 2;
   const MARGIN = 12;
+  const FAB_X = W - MOBILE_BALL_R;
+  const FAB_Y = H - MOBILE_BALL_R;
   mobileBalls = [];
 
-  // Pre-seed obstacles: include the '분류' fab ball position so nothing overlaps it
-  const placed = [{ x: W - MOBILE_BALL_R, y: H - MOBILE_BALL_R }];
-
-  // Shuffle order so appearance sequence is different each tap
+  const placed = [{ x: FAB_X, y: FAB_Y }];
   const shuffled = [...BALL_CONFIG].sort(() => Math.random() - 0.5);
 
   shuffled.forEach((cfg, i) => {
-    // Rejection sampling: find a random non-overlapping position
     let x, y, tries = 0;
     do {
       x = MARGIN + MOBILE_BALL_R + Math.random() * (W - (MARGIN + MOBILE_BALL_R) * 2);
@@ -370,13 +368,14 @@ function spawnMobileBalls() {
       mobileBallsOpen = false;
     });
 
-    const delay = i * 35;
+    // Start at fab position, shoot out to random position (ease-out: fast then slow)
+    const delay = i * 28;
     el.style.opacity = '0';
-    el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(0.65)`;
+    el.style.transform = `translate(${FAB_X - MOBILE_BALL_R}px, ${FAB_Y - MOBILE_BALL_R}px) scale(0.35)`;
     layer.appendChild(el);
 
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      el.style.transition = `opacity 0.22s ease ${delay}ms, transform 0.22s ease ${delay}ms`;
+      el.style.transition = `opacity 0.38s ease-out ${delay}ms, transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1) ${delay}ms`;
       el.style.opacity = '1';
       el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(1)`;
     }));
@@ -387,14 +386,21 @@ function spawnMobileBalls() {
 
 function despawnMobileBalls() {
   if (mobileBalls.length === 0) return;
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const FAB_X = W - MOBILE_BALL_R;
+  const FAB_Y = H - MOBILE_BALL_R;
+
   const snapshot = [...mobileBalls];
   mobileBalls = [];
+
+  // All balls gather back to fab simultaneously (ease-out: fast rush then gentle arrival)
   snapshot.forEach(b => {
-    b.el.style.transition = 'opacity 0.16s ease, transform 0.16s ease';
+    b.el.style.transition = 'opacity 0.32s cubic-bezier(0.22, 0.61, 0.36, 1), transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1)';
     b.el.style.opacity = '0';
-    b.el.style.transform = `translate(${b.x - MOBILE_BALL_R}px, ${b.y - MOBILE_BALL_R}px) scale(0.75)`;
+    b.el.style.transform = `translate(${FAB_X - MOBILE_BALL_R}px, ${FAB_Y - MOBILE_BALL_R}px) scale(0.3)`;
   });
-  setTimeout(() => snapshot.forEach(b => b.el.remove()), 180);
+  setTimeout(() => snapshot.forEach(b => b.el.remove()), 380);
 }
 
 init();
