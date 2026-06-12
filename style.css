@@ -1,11 +1,15 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR",
+    "Helvetica Neue", sans-serif;
   background: #fff;
   color: #111;
   line-height: 1.5;
@@ -70,7 +74,9 @@ button {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   background: #e0e0e0;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .card-img-wrap img {
@@ -80,8 +86,8 @@ button {
 }
 
 .card:hover .card-img-wrap {
-  transform: perspective(800px) rotateX(3deg) rotateY(3deg) translateZ(10px);
-  box-shadow: 0 16px 32px rgba(0,0,0,0.18);
+  transform: perspective(800px) rotate(10deg);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
 }
 
 /* Category badge: white text + shadow only, no background box */
@@ -94,7 +100,9 @@ button {
   font-weight: 900;
   line-height: 1.4;
   letter-spacing: -0.02em;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 0 10px rgba(0, 0, 0, 0.4);
+  text-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.65),
+    0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 550px) {
@@ -177,7 +185,9 @@ button {
   cursor: pointer;
   will-change: transform;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
-  transition: filter 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
   user-select: none;
 }
 
@@ -198,7 +208,10 @@ button {
 }
 
 .ball.active {
-  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--ball-color, #111), 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 0 0 3px #fff,
+    0 0 0 6px var(--ball-color, #111),
+    0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* "전체" ball: fixed at bottom-left, no animation */
@@ -255,7 +268,10 @@ button {
   transform: translateY(10px) scale(0.97);
   transform-origin: bottom right;
   pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.22s ease, visibility 0s 0.22s;
+  transition:
+    opacity 0.2s ease,
+    transform 0.22s ease,
+    visibility 0s 0.22s;
   visibility: hidden;
 }
 
@@ -264,7 +280,10 @@ button {
   transform: translateY(0) scale(1);
   pointer-events: auto; /* panel is tappable only when open */
   visibility: visible;
-  transition: opacity 0.2s ease, transform 0.22s ease, visibility 0s 0s;
+  transition:
+    opacity 0.2s ease,
+    transform 0.22s ease,
+    visibility 0s 0s;
 }
 
 .cat-item {
@@ -361,7 +380,9 @@ button {
   right: 12px;
   color: #fff;
   font-size: 11px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65), 0 0 10px rgba(0, 0, 0, 0.4);
+  text-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.65),
+    0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 #detail-info {
