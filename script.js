@@ -26,7 +26,11 @@ async function init() {
   renderMobilePanel();
   renderGrid(data);
   setupEvents();
-  setupMobileFab();
+  if (window.innerWidth < 550) {
+    setupMobileBalls();
+  } else {
+    setupMobileFab();
+  }
   setupBalls();
 }
 
@@ -78,7 +82,7 @@ function renderGrid(items) {
 function returnToGallery() {
   document.getElementById('detail-view').classList.add('hidden');
   document.getElementById('gallery-view').classList.remove('hidden');
-  document.getElementById('mobile-cat-wrap').style.display = '';
+  document.getElementById('mobile-balls-layer').style.display = '';
   showBallsLayer();
   window.scrollTo(0, 0);
 }
@@ -93,7 +97,9 @@ function showDetail(item) {
 
   document.getElementById('gallery-view').classList.add('hidden');
   document.getElementById('detail-view').classList.remove('hidden');
-  document.getElementById('mobile-cat-wrap').style.display = 'none';
+  despawnMobileBalls();
+  mobileBallsOpen = false;
+  document.getElementById('mobile-balls-layer').style.display = 'none';
   hideBalls();
 
   const img = document.getElementById('detail-img');
@@ -294,6 +300,129 @@ function showBallsLayer() {
   const layer = document.getElementById('balls-layer');
   if (layer) layer.style.display = '';
   if (window.innerWidth >= 550) startAnimation();
+}
+
+// ===== Mobile Ball System =====
+
+const MOBILE_BALL_R = 40;
+let mobileBalls = [];
+let mobileAnimId = null;
+let mobileBallsOpen = false;
+
+function setupMobileBalls() {
+  const layer = document.getElementById('mobile-balls-layer');
+  const fabEl = document.createElement('div');
+  fabEl.className = 'mobile-ball mobile-ball-fab';
+  fabEl.style.setProperty('--ball-color', '#111111');
+  const sp = document.createElement('span');
+  sp.textContent = '분류';
+  fabEl.appendChild(sp);
+  fabEl.addEventListener('click', toggleMobileBalls);
+  layer.appendChild(fabEl);
+}
+
+function toggleMobileBalls() {
+  if (mobileBallsOpen) {
+    despawnMobileBalls();
+  } else {
+    spawnMobileBalls();
+  }
+  mobileBallsOpen = !mobileBallsOpen;
+}
+
+function spawnMobileBalls() {
+  const layer = document.getElementById('mobile-balls-layer');
+  const W = window.innerWidth;
+  mobileBalls = [];
+
+  BALL_CONFIG.forEach((cfg, i) => {
+    const el = document.createElement('div');
+    el.className = 'mobile-ball';
+    el.style.setProperty('--ball-color', cfg.color);
+    cfg.label.forEach(line => {
+      const sp = document.createElement('span');
+      sp.textContent = line;
+      el.appendChild(sp);
+    });
+    el.addEventListener('click', () => {
+      setCategory(cfg.cat);
+      despawnMobileBalls();
+      mobileBallsOpen = false;
+    });
+
+    const x = MOBILE_BALL_R + 10 + Math.random() * (W - (MOBILE_BALL_R + 10) * 2);
+    const y = -(MOBILE_BALL_R * 2 + i * 60);
+    el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px)`;
+    layer.appendChild(el);
+    mobileBalls.push({ el, x, y, vx: (Math.random() - 0.5) * 3, vy: 0 });
+  });
+
+  runMobilePhysics();
+}
+
+function runMobilePhysics() {
+  if (mobileAnimId) cancelAnimationFrame(mobileAnimId);
+
+  const W = window.innerWidth;
+  const FLOOR = window.innerHeight - MOBILE_BALL_R - 28;
+  const G = 0.55, BOUNCE = 0.28, FRICTION = 0.86;
+
+  function step() {
+    let active = false;
+
+    for (const b of mobileBalls) {
+      b.vy += G;
+      b.x += b.vx;
+      b.y += b.vy;
+
+      if (b.y > FLOOR) {
+        b.y = FLOOR;
+        b.vy = -Math.abs(b.vy) * BOUNCE;
+        b.vx *= FRICTION;
+        if (Math.abs(b.vy) < 0.5) b.vy = 0;
+        if (Math.abs(b.vx) < 0.05) b.vx = 0;
+      }
+      if (b.x < MOBILE_BALL_R) { b.x = MOBILE_BALL_R; b.vx = Math.abs(b.vx) * 0.6; }
+      else if (b.x > W - MOBILE_BALL_R) { b.x = W - MOBILE_BALL_R; b.vx = -Math.abs(b.vx) * 0.6; }
+
+      b.el.style.transform = `translate(${b.x - MOBILE_BALL_R}px, ${b.y - MOBILE_BALL_R}px)`;
+      if (b.vy !== 0 || b.vx !== 0 || b.y < FLOOR) active = true;
+    }
+
+    // Ball-ball collision
+    for (let i = 0; i < mobileBalls.length; i++) {
+      for (let j = i + 1; j < mobileBalls.length; j++) {
+        const a = mobileBalls[i], b = mobileBalls[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minD = MOBILE_BALL_R * 2;
+        if (dist < minD && dist > 0) {
+          const overlap = (minD - dist) / 2;
+          const nx = dx / dist, ny = dy / dist;
+          a.x -= nx * overlap; a.y -= ny * overlap;
+          b.x += nx * overlap; b.y += ny * overlap;
+          const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
+          const dot = dvx * nx + dvy * ny;
+          if (dot > 0) {
+            const k = dot * 0.55;
+            a.vx -= k * nx; a.vy -= k * ny;
+            b.vx += k * nx; b.vy += k * ny;
+          }
+          active = true;
+        }
+      }
+    }
+
+    mobileAnimId = active ? requestAnimationFrame(step) : null;
+  }
+
+  mobileAnimId = requestAnimationFrame(step);
+}
+
+function despawnMobileBalls() {
+  if (mobileAnimId) { cancelAnimationFrame(mobileAnimId); mobileAnimId = null; }
+  mobileBalls.forEach(b => b.el.remove());
+  mobileBalls = [];
 }
 
 init();

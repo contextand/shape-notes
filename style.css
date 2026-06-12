@@ -225,21 +225,7 @@ button {
 /* ===== Mobile Floating Category Button ===== */
 
 #mobile-cat-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-  position: fixed;
-  bottom: 24px;
-  right: 18px;
-  z-index: 100;
-  pointer-events: none; /* container is transparent to touch */
-}
-
-@media (min-width: 550px) {
-  #mobile-cat-wrap {
-    display: none;
-  }
+  display: none; /* replaced by mobile ball system */
 }
 
 #cat-fab {
@@ -315,6 +301,56 @@ button {
 
 .cat-item:hover:not(.active) {
   color: #555;
+}
+
+/* ===== Mobile Ball System ===== */
+
+#mobile-balls-layer {
+  display: none;
+}
+
+@media (max-width: 549px) {
+  #mobile-balls-layer {
+    display: block;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 100;
+  }
+}
+
+.mobile-ball {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--ball-color, #111);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  user-select: none;
+  will-change: transform;
+}
+
+.mobile-ball span {
+  display: block;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: -0.03em;
+  padding: 0 6px;
+}
+
+.mobile-ball-fab {
+  bottom: 28px;
+  right: 18px;
+  will-change: auto;
 }
 
 /* ===== Detail View ===== */
