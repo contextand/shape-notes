@@ -304,9 +304,8 @@ function showBallsLayer() {
 
 // ===== Mobile Ball System =====
 
-const MOBILE_BALL_R = 55;
+const MOBILE_BALL_R = 42; // 84px diameter — 4 per row
 let mobileBalls = [];
-let mobileAnimId = null;
 let mobileBallsOpen = false;
 
 function setupMobileBalls() {
@@ -333,131 +332,69 @@ function toggleMobileBalls() {
 function spawnMobileBalls() {
   const layer = document.getElementById('mobile-balls-layer');
   const W = window.innerWidth;
+  const D = MOBILE_BALL_R * 2;
+  const H_GAP = 8;
+  const V_GAP = 10;
+  const TOP = 20;
   mobileBalls = [];
 
-  BALL_CONFIG.forEach((cfg, i) => {
-    const el = document.createElement('div');
-    el.className = 'mobile-ball';
-    el.style.setProperty('--ball-color', cfg.color);
-    cfg.label.forEach(line => {
-      const sp = document.createElement('span');
-      sp.textContent = line;
-      el.appendChild(sp);
-    });
-    el.addEventListener('click', () => {
-      setCategory(cfg.cat);
-      despawnMobileBalls();
-      mobileBallsOpen = false;
-    });
+  // Rows of 1-2-3-4 then fill remainder 4 at a time
+  const rowCounts = [1, 2, 3, 4];
+  let remaining = BALL_CONFIG.length - 10;
+  while (remaining > 0) { rowCounts.push(Math.min(4, remaining)); remaining -= 4; }
 
-    const x = MOBILE_BALL_R + 10 + Math.random() * (W - (MOBILE_BALL_R + 10) * 2);
-    const y = -(MOBILE_BALL_R * 2 + i * 60);
-    el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px)`;
-    layer.appendChild(el);
-    mobileBalls.push({ el, x, y, vx: (Math.random() - 0.5) * 3, vy: 0 });
+  let idx = 0;
+  rowCounts.forEach((n, rowIdx) => {
+    const rowWidth = n * D + (n - 1) * H_GAP;
+    const startX = (W - rowWidth) / 2 + MOBILE_BALL_R;
+    const y = TOP + rowIdx * (D + V_GAP) + MOBILE_BALL_R;
+    const delay = rowIdx * 55;
+
+    for (let i = 0; i < n && idx < BALL_CONFIG.length; i++, idx++) {
+      const cfg = BALL_CONFIG[idx];
+      const x = startX + i * (D + H_GAP);
+
+      const el = document.createElement('div');
+      el.className = 'mobile-ball';
+      el.style.setProperty('--ball-color', cfg.color);
+      cfg.label.forEach(line => {
+        const sp = document.createElement('span');
+        sp.textContent = line;
+        el.appendChild(sp);
+      });
+      el.addEventListener('click', () => {
+        setCategory(cfg.cat);
+        despawnMobileBalls();
+        mobileBallsOpen = false;
+      });
+
+      // Start hidden, then animate in with row-staggered delay
+      el.style.opacity = '0';
+      el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(0.65)`;
+      layer.appendChild(el);
+
+      // Double rAF ensures initial styles are painted before transition starts
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        el.style.transition = `opacity 0.22s ease ${delay}ms, transform 0.22s ease ${delay}ms`;
+        el.style.opacity = '1';
+        el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(1)`;
+      }));
+
+      mobileBalls.push({ el, x, y });
+    }
   });
-
-  runMobilePhysics();
-}
-
-function runMobilePhysics() {
-  if (mobileAnimId) cancelAnimationFrame(mobileAnimId);
-
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-  const FLOOR = H - MOBILE_BALL_R;
-  const FAB_X = W - MOBILE_BALL_R;
-  const FAB_Y = H - MOBILE_BALL_R;
-  const G = 0.55, BOUNCE = 0.25, FRICTION = 0.84;
-
-  function step() {
-    // Integrate velocity and position
-    for (const b of mobileBalls) {
-      b.vy += G;
-      b.x += b.vx;
-      b.y += b.vy;
-    }
-
-    // 4-pass constraint resolution for clean non-overlapping boundaries
-    for (let pass = 0; pass < 4; pass++) {
-      // Floor and walls
-      for (const b of mobileBalls) {
-        if (b.y > FLOOR) {
-          b.y = FLOOR;
-          if (pass === 0) {
-            b.vy = -Math.abs(b.vy) * BOUNCE;
-            b.vx *= FRICTION;
-            if (Math.abs(b.vy) < 0.5) b.vy = 0;
-            if (Math.abs(b.vx) < 0.05) b.vx = 0;
-          }
-        }
-        if (b.x < MOBILE_BALL_R) {
-          b.x = MOBILE_BALL_R;
-          if (pass === 0) b.vx = Math.abs(b.vx) * 0.5;
-        } else if (b.x > W - MOBILE_BALL_R) {
-          b.x = W - MOBILE_BALL_R;
-          if (pass === 0) b.vx = -Math.abs(b.vx) * 0.5;
-        }
-        // '분류' fab ball as static obstacle
-        const fdx = b.x - FAB_X, fdy = b.y - FAB_Y;
-        const fd = Math.sqrt(fdx * fdx + fdy * fdy);
-        const fMin = MOBILE_BALL_R * 2;
-        if (fd < fMin && fd > 0) {
-          const fnx = fdx / fd, fny = fdy / fd;
-          b.x += fnx * (fMin - fd);
-          b.y += fny * (fMin - fd);
-          if (pass === 0) {
-            const fdot = b.vx * fnx + b.vy * fny;
-            if (fdot < 0) {
-              b.vx -= fdot * fnx * (1 + BOUNCE);
-              b.vy -= fdot * fny * (1 + BOUNCE);
-            }
-          }
-        }
-      }
-
-      // Ball-ball collisions
-      for (let i = 0; i < mobileBalls.length; i++) {
-        for (let j = i + 1; j < mobileBalls.length; j++) {
-          const a = mobileBalls[i], b = mobileBalls[j];
-          const dx = b.x - a.x, dy = b.y - a.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const minD = MOBILE_BALL_R * 2;
-          if (dist < minD && dist > 0) {
-            const nx = dx / dist, ny = dy / dist;
-            const half = (minD - dist) * 0.5;
-            a.x -= nx * half; a.y -= ny * half;
-            b.x += nx * half; b.y += ny * half;
-            if (pass === 0) {
-              const dvx = a.vx - b.vx, dvy = a.vy - b.vy;
-              const dot = dvx * nx + dvy * ny;
-              if (dot > 0) {
-                const k = dot * 0.45;
-                a.vx -= k * nx; a.vy -= k * ny;
-                b.vx += k * nx; b.vy += k * ny;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Update DOM and check if still active
-    let active = false;
-    for (const b of mobileBalls) {
-      b.el.style.transform = `translate(${b.x - MOBILE_BALL_R}px, ${b.y - MOBILE_BALL_R}px)`;
-      if (Math.abs(b.vy) > 0.05 || Math.abs(b.vx) > 0.05 || b.y < FLOOR - 0.5) active = true;
-    }
-    mobileAnimId = active ? requestAnimationFrame(step) : null;
-  }
-
-  mobileAnimId = requestAnimationFrame(step);
 }
 
 function despawnMobileBalls() {
-  if (mobileAnimId) { cancelAnimationFrame(mobileAnimId); mobileAnimId = null; }
-  mobileBalls.forEach(b => b.el.remove());
+  if (mobileBalls.length === 0) return;
+  const snapshot = [...mobileBalls];
   mobileBalls = [];
+  snapshot.forEach(b => {
+    b.el.style.transition = 'opacity 0.16s ease, transform 0.16s ease';
+    b.el.style.opacity = '0';
+    b.el.style.transform = `translate(${b.x - MOBILE_BALL_R}px, ${b.y - MOBILE_BALL_R}px) scale(0.75)`;
+  });
+  setTimeout(() => snapshot.forEach(b => b.el.remove()), 180);
 }
 
 init();
