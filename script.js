@@ -332,56 +332,56 @@ function toggleMobileBalls() {
 function spawnMobileBalls() {
   const layer = document.getElementById('mobile-balls-layer');
   const W = window.innerWidth;
+  const H = window.innerHeight;
   const D = MOBILE_BALL_R * 2;
-  const H_GAP = 8;
-  const V_GAP = 10;
-  const TOP = 20;
+  const MARGIN = 12;
   mobileBalls = [];
 
-  // Rows of 1-2-3-4 then fill remainder 4 at a time
-  const rowCounts = [1, 2, 3, 4];
-  let remaining = BALL_CONFIG.length - 10;
-  while (remaining > 0) { rowCounts.push(Math.min(4, remaining)); remaining -= 4; }
+  // Pre-seed obstacles: include the '분류' fab ball position so nothing overlaps it
+  const placed = [{ x: W - MOBILE_BALL_R, y: H - MOBILE_BALL_R }];
 
-  let idx = 0;
-  rowCounts.forEach((n, rowIdx) => {
-    const rowWidth = n * D + (n - 1) * H_GAP;
-    const startX = (W - rowWidth) / 2 + MOBILE_BALL_R;
-    const y = TOP + rowIdx * (D + V_GAP) + MOBILE_BALL_R;
-    const delay = rowIdx * 55;
+  // Shuffle order so appearance sequence is different each tap
+  const shuffled = [...BALL_CONFIG].sort(() => Math.random() - 0.5);
 
-    for (let i = 0; i < n && idx < BALL_CONFIG.length; i++, idx++) {
-      const cfg = BALL_CONFIG[idx];
-      const x = startX + i * (D + H_GAP);
+  shuffled.forEach((cfg, i) => {
+    // Rejection sampling: find a random non-overlapping position
+    let x, y, tries = 0;
+    do {
+      x = MARGIN + MOBILE_BALL_R + Math.random() * (W - (MARGIN + MOBILE_BALL_R) * 2);
+      y = MARGIN + MOBILE_BALL_R + Math.random() * (H - MOBILE_BALL_R * 3 - MARGIN);
+      tries++;
+    } while (tries < 80 && placed.some(p => {
+      const dx = p.x - x, dy = p.y - y;
+      return Math.sqrt(dx * dx + dy * dy) < D + 6;
+    }));
+    placed.push({ x, y });
 
-      const el = document.createElement('div');
-      el.className = 'mobile-ball';
-      el.style.setProperty('--ball-color', cfg.color);
-      cfg.label.forEach(line => {
-        const sp = document.createElement('span');
-        sp.textContent = line;
-        el.appendChild(sp);
-      });
-      el.addEventListener('click', () => {
-        setCategory(cfg.cat);
-        despawnMobileBalls();
-        mobileBallsOpen = false;
-      });
+    const el = document.createElement('div');
+    el.className = 'mobile-ball';
+    el.style.setProperty('--ball-color', cfg.color);
+    cfg.label.forEach(line => {
+      const sp = document.createElement('span');
+      sp.textContent = line;
+      el.appendChild(sp);
+    });
+    el.addEventListener('click', () => {
+      setCategory(cfg.cat);
+      despawnMobileBalls();
+      mobileBallsOpen = false;
+    });
 
-      // Start hidden, then animate in with row-staggered delay
-      el.style.opacity = '0';
-      el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(0.65)`;
-      layer.appendChild(el);
+    const delay = i * 35;
+    el.style.opacity = '0';
+    el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(0.65)`;
+    layer.appendChild(el);
 
-      // Double rAF ensures initial styles are painted before transition starts
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        el.style.transition = `opacity 0.22s ease ${delay}ms, transform 0.22s ease ${delay}ms`;
-        el.style.opacity = '1';
-        el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(1)`;
-      }));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.transition = `opacity 0.22s ease ${delay}ms, transform 0.22s ease ${delay}ms`;
+      el.style.opacity = '1';
+      el.style.transform = `translate(${x - MOBILE_BALL_R}px, ${y - MOBILE_BALL_R}px) scale(1)`;
+    }));
 
-      mobileBalls.push({ el, x, y });
-    }
+    mobileBalls.push({ el, x, y });
   });
 }
 
