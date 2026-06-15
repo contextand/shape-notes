@@ -468,12 +468,9 @@ button {
     height: 100%;
   }
 
-  #detail-right {
+  #detail-info {
     flex: 1;
     padding-top: 4px;
-  }
-
-  #detail-info {
     gap: 20px;
   }
 
