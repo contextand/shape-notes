@@ -459,13 +459,7 @@ button {
   }
 
   #detail-img-wrap {
-    flex: 0 0 auto;
-    height: calc(100vh - 120px);
-  }
-
-  #detail-img {
-    width: auto;
-    height: 100%;
+    flex: 0 0 42%;
   }
 
   #detail-info {
@@ -476,11 +470,6 @@ button {
 
   #related-cat-title {
     display: none;
-  }
-
-  #related-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 4px;
   }
 
   #detail-title {
