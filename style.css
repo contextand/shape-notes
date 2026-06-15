@@ -470,14 +470,22 @@ button {
     object-position: top;
   }
 
-  #detail-info {
+  #detail-right {
     flex: 1;
     padding-top: 4px;
+  }
+
+  #detail-info {
     gap: 20px;
   }
 
   #related-cat-title {
     display: none;
+  }
+
+  #related-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 3px;
   }
 
   #detail-title {
