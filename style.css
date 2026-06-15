@@ -344,6 +344,7 @@ button {
 }
 
 .mobile-ball-fab {
+  position: fixed;
   bottom: 0;
   right: 0;
   will-change: auto;
@@ -453,12 +454,43 @@ button {
 
   #detail-main {
     flex-direction: row;
-    gap: 64px;
+    gap: 40px;
     align-items: flex-start;
   }
 
+  #related-wrap {
+    order: 0;
+    flex: 0 0 auto;
+    width: 96px;
+    margin-top: 0;
+    position: sticky;
+    top: 40px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  #related-cat-title {
+    font-size: 26px;
+    font-weight: 500;
+    color: #111;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+    margin-bottom: 16px;
+  }
+
+  #related-grid {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
   #detail-img-wrap {
-    flex: 0 0 42%;
+    flex: 0 0 auto;
+    height: calc(100vh - 120px);
+  }
+
+  #detail-img {
+    width: auto;
+    height: 100%;
   }
 
   #detail-info {
@@ -483,7 +515,8 @@ button {
 /* ===== Related Images: vertical grid ===== */
 
 #related-wrap {
-  margin-top: 40px;
+  order: 3;
+  margin-top: 20px;
 }
 
 #related-cat-title {
