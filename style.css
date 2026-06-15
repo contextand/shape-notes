@@ -454,33 +454,8 @@ button {
 
   #detail-main {
     flex-direction: row;
-    gap: 40px;
+    gap: 64px;
     align-items: flex-start;
-  }
-
-  #related-wrap {
-    order: 0;
-    flex: 0 0 auto;
-    width: 96px;
-    margin-top: 0;
-    position: sticky;
-    top: 40px;
-    max-height: calc(100vh - 100px);
-    overflow-y: auto;
-  }
-
-  #related-cat-title {
-    font-size: 26px;
-    font-weight: 500;
-    color: #111;
-    letter-spacing: -0.02em;
-    line-height: 1.35;
-    margin-bottom: 16px;
-  }
-
-  #related-grid {
-    grid-template-columns: 1fr;
-    gap: 3px;
   }
 
   #detail-img-wrap {
@@ -493,10 +468,22 @@ button {
     height: 100%;
   }
 
-  #detail-info {
+  #detail-right {
     flex: 1;
     padding-top: 4px;
+  }
+
+  #detail-info {
     gap: 20px;
+  }
+
+  #related-cat-title {
+    display: none;
+  }
+
+  #related-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 4px;
   }
 
   #detail-title {
@@ -515,8 +502,7 @@ button {
 /* ===== Related Images: vertical grid ===== */
 
 #related-wrap {
-  order: 3;
-  margin-top: 20px;
+  margin-top: 40px;
 }
 
 #related-cat-title {
