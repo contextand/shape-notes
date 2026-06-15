@@ -105,7 +105,6 @@ function showDetail(item) {
   const img = document.getElementById('detail-img');
   img.src = `img/${item.no}.jpg`;
   img.alt = item.title;
-  document.getElementById('detail-cat-badge').textContent = item.category;
   document.getElementById('detail-title').textContent = item.title;
   document.getElementById('detail-sub').textContent = item.sub;
   document.getElementById('detail-tags').innerHTML =
@@ -116,6 +115,7 @@ function showDetail(item) {
   const relatedGrid = document.getElementById('related-grid');
 
   if (related.length > 0) {
+    document.getElementById('related-cat-title').textContent = item.category;
     relatedGrid.innerHTML = related.map(r => `
       <div class="related-card" data-no="${r.no}">
         <img src="img/${r.no}.jpg" alt="${r.title}" loading="lazy">

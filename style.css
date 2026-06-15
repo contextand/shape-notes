@@ -90,7 +90,7 @@ button {
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
 }
 
-/* Category badge: white text + shadow only, no background box */
+/* Category badge: white text only */
 .cat-badge {
   position: absolute;
   bottom: 7px;
@@ -100,9 +100,6 @@ button {
   font-weight: 900;
   line-height: 1.4;
   letter-spacing: -0.02em;
-  text-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.65),
-    0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 @media (min-width: 550px) {
@@ -410,14 +407,7 @@ button {
 }
 
 #detail-cat-badge {
-  position: absolute;
-  bottom: 10px;
-  right: 12px;
-  color: #fff;
-  font-size: 11px;
-  text-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.65),
-    0 0 10px rgba(0, 0, 0, 0.4);
+  display: none;
 }
 
 #detail-info {
@@ -494,6 +484,14 @@ button {
 
 #related-wrap {
   margin-top: 40px;
+}
+
+#related-cat-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #aaa;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
 }
 
 #related-grid {
