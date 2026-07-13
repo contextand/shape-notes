@@ -25,6 +25,7 @@ async function init() {
   renderCategoryBar();
   renderMobilePanel();
   renderGrid(data);
+  history.replaceState({ view: 'gallery', cat: '' }, '');
   setupEvents();
   if (window.innerWidth < 550) {
     setupMobileBalls();
@@ -51,7 +52,7 @@ function renderMobilePanel() {
   }).join('');
 }
 
-function setCategory(cat) {
+function setCategory(cat, pushHistory = true) {
   activeCategory = cat;
   // Sync desktop chips
   document.querySelectorAll('#category-bar .chip').forEach(c => {
@@ -63,6 +64,9 @@ function setCategory(cat) {
   });
   const filtered = cat ? data.filter(d => d.category === cat) : data;
   renderGrid(filtered);
+  if (pushHistory) {
+    history.pushState({ view: 'gallery', cat }, '');
+  }
 }
 
 function renderGrid(items) {
@@ -147,9 +151,17 @@ function setupEvents() {
     history.back();
   });
 
-  window.addEventListener('popstate', () => {
+  window.addEventListener('popstate', e => {
+    const state = e.state;
     if (!document.getElementById('detail-view').classList.contains('hidden')) {
       returnToGallery();
+      if (state?.view === 'gallery') {
+        setCategory(state.cat ?? '', false);
+      }
+    } else if (state?.view === 'gallery') {
+      setCategory(state.cat ?? '', false);
+    } else if (!state) {
+      setCategory('', false);
     }
   });
 
