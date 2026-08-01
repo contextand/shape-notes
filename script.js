@@ -30,9 +30,8 @@ async function init() {
   if (window.innerWidth < 550) {
     setupMobileBalls();
   } else {
-    setupMobileFab();
+    setupDesktopFab();
   }
-  setupBalls();
 }
 
 function renderCategoryBar() {
@@ -77,7 +76,6 @@ function renderGrid(items) {
     <div class="card" data-no="${item.no}">
       <div class="card-img-wrap">
         <img src="img/${item.no}.jpg" alt="${item.title}" loading="${loading}" ${priority} decoding="async">
-        <span class="cat-badge">${item.category}</span>
       </div>
     </div>`;
   }).join('');
@@ -87,7 +85,6 @@ function returnToGallery() {
   document.getElementById('detail-view').classList.add('hidden');
   document.getElementById('gallery-view').classList.remove('hidden');
   document.getElementById('mobile-balls-layer').style.display = '';
-  showBallsLayer();
   window.scrollTo(0, 0);
 }
 
@@ -104,7 +101,6 @@ function showDetail(item) {
   despawnMobileBalls();
   mobileBallsOpen = false;
   document.getElementById('mobile-balls-layer').style.display = 'none';
-  hideBalls();
 
   const img = document.getElementById('detail-img');
   img.src = `img/${item.no}.jpg`;
@@ -114,20 +110,15 @@ function showDetail(item) {
   document.getElementById('detail-tags').innerHTML =
     item.tag.map(t => `<span class="tag">#${t}</span>`).join('');
 
-  const related = data.filter(d => d.category === item.category && d.no !== item.no);
+  const related = data.filter(d => d.no !== item.no);
   const relatedWrap = document.getElementById('related-wrap');
   const relatedGrid = document.getElementById('related-grid');
 
-  if (related.length > 0) {
-    document.getElementById('related-cat-title').textContent = item.category;
-    relatedGrid.innerHTML = related.map(r => `
-      <div class="related-card" data-no="${r.no}">
-        <img src="img/${r.no}.jpg" alt="${r.title}" loading="lazy">
-      </div>`).join('');
-    relatedWrap.classList.remove('hidden');
-  } else {
-    relatedWrap.classList.add('hidden');
-  }
+  relatedGrid.innerHTML = related.map(r => `
+    <div class="related-card" data-no="${r.no}">
+      <img src="img/${r.no}.jpg" alt="${r.title}" loading="lazy">
+    </div>`).join('');
+  relatedWrap.classList.remove('hidden');
 
   window.scrollTo(0, 0);
 }
@@ -151,6 +142,15 @@ function setupEvents() {
     history.back();
   });
 
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('detail-view').classList.contains('hidden')) return;
+    const state = history.state;
+    if (!state?.no) return;
+    const idx = data.findIndex(d => d.no === state.no);
+    if (e.key === 'ArrowRight' && idx < data.length - 1) showDetail(data[idx + 1]);
+    if (e.key === 'ArrowLeft' && idx > 0) showDetail(data[idx - 1]);
+  });
+
   window.addEventListener('popstate', e => {
     const state = e.state;
     if (!document.getElementById('detail-view').classList.contains('hidden')) {
@@ -172,7 +172,7 @@ function setupEvents() {
   });
 }
 
-function setupMobileFab() {
+function setupDesktopFab() {
   const fab = document.getElementById('cat-fab');
   const panel = document.getElementById('cat-panel');
 
@@ -191,6 +191,12 @@ function setupMobileFab() {
     if (!item) return;
     setCategory(item.dataset.cat);
     panel.classList.remove('open');
+  });
+
+  document.addEventListener('click', e => {
+    if (!fab.contains(e.target) && !panel.contains(e.target)) {
+      panel.classList.remove('open');
+    }
   });
 }
 

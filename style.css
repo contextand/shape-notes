@@ -152,20 +152,10 @@ button {
   }
 }
 
-/* ===== Floating Balls (Desktop Only) ===== */
+/* ===== Floating Balls (disabled) ===== */
 
 #balls-layer {
   display: none;
-}
-
-@media (min-width: 550px) {
-  #balls-layer {
-    display: block;
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 30;
-  }
 }
 
 .ball {
@@ -219,32 +209,55 @@ button {
   will-change: auto;
 }
 
-/* ===== Mobile Floating Category Button ===== */
+/* ===== Floating Category Button (Mobile & Desktop) ===== */
 
 #mobile-cat-wrap {
-  display: none; /* replaced by mobile ball system */
+  display: none; /* hidden on mobile — replaced by ball system */
+}
+
+@media (min-width: 550px) {
+  #mobile-cat-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+  }
 }
 
 #cat-fab {
-  background: #111;
+  background: transparent;
   color: #fff;
-  font-size: 14px;
+  font-size: 50px;
   font-weight: 900;
   letter-spacing: -0.02em;
-  padding: 10px 20px;
+  padding: 0;
   border-radius: 0;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: none;
   cursor: pointer;
   line-height: 1;
-  pointer-events: auto; /* FAB is always tappable */
+  pointer-events: auto;
+  white-space: nowrap;
+  width: 100%;
+  text-align: right;
+}
+
+#cat-fab {
+  display: none;
+}
+
+#cat-fab:hover {
+  opacity: 0.5;
 }
 
 #cat-panel {
-  background: #fff;
+  background: transparent;
   border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.14);
-  border: 1px solid #ebebeb;
+  box-shadow: none;
+  border: none;
   min-width: 140px;
   /* slide-up animation state */
   opacity: 0;
@@ -272,11 +285,11 @@ button {
 .cat-item {
   display: block;
   width: 100%;
-  padding: 13px 22px;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: left;
-  color: #bbb;
+  padding: 0;
+  font-size: 50px;
+  font-weight: 900;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.45);
   white-space: nowrap;
   cursor: pointer;
   letter-spacing: -0.02em;
@@ -284,7 +297,6 @@ button {
   transition: color 0.15s;
   background: none;
   border: none;
-  border-bottom: 1px solid #f2f2f2;
   font-family: inherit;
 }
 
@@ -293,11 +305,11 @@ button {
 }
 
 .cat-item.active {
-  color: #111;
+  color: #fff;
 }
 
 .cat-item:hover:not(.active) {
-  color: #555;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 /* ===== Mobile Ball System ===== */
@@ -354,7 +366,7 @@ button {
 
 #detail-view {
   min-height: 100vh;
-  padding: 16px 16px 48px;
+  padding: 22px 16px 48px;
 }
 
 #back-btn {
@@ -445,7 +457,7 @@ button {
 
 @media (min-width: 768px) {
   #detail-view {
-    padding: 40px 40px 60px;
+    padding: 22px 40px 60px;
   }
 
   #back-btn {
@@ -484,15 +496,21 @@ button {
   }
 
   #detail-title {
-    font-size: 26px;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
   }
 
   #detail-sub {
-    font-size: 16px;
+    font-size: 30px;
+    line-height: 1.7;
+    font-weight: 300;
+    color: #000000;
+    letter-spacing: 2px;
   }
 
   .tag {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   #related-wrap {
