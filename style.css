@@ -494,17 +494,17 @@ button {
   }
 
   #detail-title {
-    font-size: 32px;
+    font-size: 25px;
     font-weight: 900;
     letter-spacing: 0;
-    color: #444444;
+    color: #222222;
   }
 
   #detail-sub {
-    font-size: 30px;
+    font-size: 25px;
     line-height: 1.7;
     font-weight: 300;
-    color: #444444;
+    color: #222222;
     letter-spacing: 0;
   }
 
